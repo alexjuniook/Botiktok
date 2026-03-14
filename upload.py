@@ -8,9 +8,10 @@ from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os
+import json
 
 def postar_no_tiktok(caminho_video, descricao):
-    print("\n[*] Iniciando módulo de postagem via Selenium (Headless)...")
+    print("\n[*] Iniciando módulo de postagem na Nuvem (Injeção de Cookies)...")
     
     if not os.path.exists(caminho_video):
         print(f"[-] Erro: Arquivo {caminho_video} não encontrado.")
@@ -19,16 +20,12 @@ def postar_no_tiktok(caminho_video, descricao):
     caminho_absoluto = os.path.abspath(caminho_video)
 
     opcoes = Options()
-    
-    # ATUALIZAÇÃO PARA NUVEM: Roda o Chrome de forma invisível simulando uma tela 1080p
     opcoes.add_argument("--headless=new")
     opcoes.add_argument("--window-size=1920,1080")
     opcoes.add_argument("--disable-dev-shm-usage")
     opcoes.add_argument("--no-sandbox")
     
-    # O diretório da sessão será gerado no servidor
-    caminho_perfil = os.path.abspath("./sessao_tiktok_selenium")
-    opcoes.add_argument(f"user-data-dir={caminho_perfil}")
+    # A pasta de usuário local foi removida, pois usaremos cookies puros
     opcoes.add_argument("--disable-blink-features=AutomationControlled")
     opcoes.add_experimental_option("excludeSwitches", ["enable-automation"])
     opcoes.add_experimental_option('useAutomationExtension', False)
@@ -37,7 +34,32 @@ def postar_no_tiktok(caminho_video, descricao):
     navegador = webdriver.Chrome(service=servico, options=opcoes)
 
     try:
-        print("[*] Acessando a página de upload...")
+        print("[*] Preparando o navegador e acessando o domínio base...")
+        # É obrigatório acessar o site primeiro antes de injetar os cookies
+        navegador.get("https://www.tiktok.com")
+        time.sleep(5)
+
+        print("[*] Injetando a sessão de login salva no cofre...")
+        cookies_str = os.environ.get("TIKTOK_COOKIES")
+        
+        if not cookies_str:
+            print("[-] ERRO FATAL: Variável TIKTOK_COOKIES não foi encontrada no ambiente!")
+            return False
+
+        cookies = json.loads(cookies_str)
+        for cookie in cookies:
+            try:
+                # O Selenium precisa apenas dos dados vitais do cookie
+                navegador.add_cookie({
+                    'name': cookie['name'],
+                    'value': cookie['value'],
+                    'domain': cookie.get('domain', '.tiktok.com'),
+                    'path': cookie.get('path', '/')
+                })
+            except Exception as e:
+                pass
+
+        print("[+] Login fantasma realizado! Acessando a página de upload...")
         navegador.get("https://www.tiktok.com/creator-center/upload")
         
         print("\n[*] Aguardando a página carregar (15 segundos)...")
