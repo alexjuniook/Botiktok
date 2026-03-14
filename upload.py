@@ -101,11 +101,13 @@ def postar_no_tiktok(caminho_video, descricao):
         navegador.execute_script("document.body.click();")
         time.sleep(3)
 
-        print("[*] Procurando botão de Publicar...")
-        botoes = navegador.find_elements(By.XPATH, "//button")
+        print("[*] Procurando botão de Publicar (Alvo Exato)...")
+        # Adicionamos divs que também funcionam como botões no TikTok
+        botoes = navegador.find_elements(By.XPATH, "//button | //div[@role='button']")
         for btn in botoes:
             texto = btn.text.strip().lower()
-            if "post" in texto or "publicar" in texto:
+            # A palavra tem que ser EXATAMENTE igual, para ignorar o menu "Posts"
+            if texto in ["post", "publicar", "postar"]:
                 tentativas = 0
                 while (btn.get_attribute("disabled") or btn.get_attribute("aria-disabled") == "true") and tentativas < 10:
                     print("[!] O botão está bloqueado (TikTok processando). Aguardando mais 10s...")
