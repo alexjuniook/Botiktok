@@ -45,7 +45,7 @@ def obter_tema_e_visual_em_alta():
     else:
         contexto = "Histórias intrigantes, teorias da conspiração, crimes reais (true crime) ou casos assustadores."
 
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.5-flash-lite')
     prompt = f"""
     Aja como um Diretor de TV focado em INFORMAÇÃO e STORYTELLING.
     O público neste horário prefere: {contexto}.
@@ -70,7 +70,7 @@ def obter_tema_e_visual_em_alta():
         return resposta.replace('|', '').strip(), "nature"
 
 def gerar_roteiro(tema):
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.5-flash-lite')
     prompt = f"""
     Aja como um Narrador de Documentários ou Jornalista. Crie um roteiro INFORMATIVO e magnético para o TikTok sobre o tema: "{tema}".
     
