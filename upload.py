@@ -25,13 +25,13 @@ def postar_no_tiktok(caminho_video, descricao):
     opcoes.add_argument("--disable-dev-shm-usage")
     opcoes.add_argument("--no-sandbox")
     
+    # A MÁSCARA DE NAVEGADOR COMUM
+    opcoes.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+    
     opcoes.add_argument("--disable-blink-features=AutomationControlled")
     opcoes.add_experimental_option("excludeSwitches", ["enable-automation"])
     opcoes.add_experimental_option('useAutomationExtension', False)
-
-    servico = Service(ChromeDriverManager().install())
-    navegador = webdriver.Chrome(service=servico, options=opcoes)
-
+    
     try:
         print("[*] Preparando o navegador e acessando o domínio base...")
         navegador.get("https://www.tiktok.com")
