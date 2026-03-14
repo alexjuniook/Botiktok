@@ -2,9 +2,8 @@ name: Bot TikTok Automático
 
 on:
   schedule:
-    # Roda no minuto 0 de toda hora (Ex: 14:00, 15:00, 16:00...)
     - cron: '0 * * * *'
-  workflow_dispatch: # Permite que você clique em "Run workflow" manualmente no GitHub
+  workflow_dispatch: 
 
 jobs:
   postar_video:
@@ -23,7 +22,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y imagemagick
-        # Corrige as políticas de segurança do ImageMagick no Linux para permitir textos no MoviePy
         sudo sed -i 's/<policy domain="path" rights="none" pattern="@\*"//g' /etc/ImageMagick-6/policy.xml
 
     - name: Instalar bibliotecas do Python
@@ -35,3 +33,10 @@ jobs:
         PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         TIKTOK_COOKIES: ${{ secrets.TIKTOK_COOKIES }}
       run: python bot.py
+
+    - name: Capturar Câmera de Segurança (Fotos da Tela)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: auditoria-tiktok
+        path: "*.png"
