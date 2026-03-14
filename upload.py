@@ -91,8 +91,8 @@ def postar_no_tiktok(caminho_video, descricao):
         caixa_texto.send_keys(descricao)
         time.sleep(3)
         
-        print("[*] Fechando o menu de hashtags...")
-        caixa_texto.send_keys(Keys.ESCAPE)
+        print("[*] Fechando o menu de hashtags clicando fora...")
+        navegador.execute_script("document.body.click();")
         time.sleep(3)
 
         print("[*] Procurando botão de Publicar...")
