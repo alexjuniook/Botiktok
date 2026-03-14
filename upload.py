@@ -11,7 +11,7 @@ import os
 import json
 
 def postar_no_tiktok(caminho_video, descricao):
-    print("\n[*] Iniciando módulo de postagem na Nuvem (Injeção de Cookies)...")
+    print("\n[*] Iniciando módulo de postagem na Nuvem (Injeção de Cookies e Máscara)...")
     
     if not os.path.exists(caminho_video):
         print(f"[-] Erro: Arquivo {caminho_video} não encontrado.")
@@ -25,14 +25,19 @@ def postar_no_tiktok(caminho_video, descricao):
     opcoes.add_argument("--disable-dev-shm-usage")
     opcoes.add_argument("--no-sandbox")
     
-    # A MÁSCARA DE NAVEGADOR COMUM
+    # A MÁSCARA DE NAVEGADOR COMUM (Bypass de Firewall)
     opcoes.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
     
     opcoes.add_argument("--disable-blink-features=AutomationControlled")
     opcoes.add_experimental_option("excludeSwitches", ["enable-automation"])
     opcoes.add_experimental_option('useAutomationExtension', False)
-    
+
+    navegador = None
+
     try:
+        servico = Service(ChromeDriverManager().install())
+        navegador = webdriver.Chrome(service=servico, options=opcoes)
+
         print("[*] Preparando o navegador e acessando o domínio base...")
         navegador.get("https://www.tiktok.com")
         time.sleep(5)
@@ -91,6 +96,7 @@ def postar_no_tiktok(caminho_video, descricao):
         caixa_texto.send_keys(descricao)
         time.sleep(3)
         
+        # AQUI ESTÁ A CORREÇÃO DO "EXIT": Clicando fora ao invés de usar ESC
         print("[*] Fechando o menu de hashtags clicando fora...")
         navegador.execute_script("document.body.click();")
         time.sleep(3)
@@ -109,11 +115,9 @@ def postar_no_tiktok(caminho_video, descricao):
                 navegador.execute_script("arguments[0].click();", btn)
                 print("[+] Clique NATIVO de publicação efetuado com sucesso!")
                 
-                # --- CÂMERA DE SEGURANÇA ATIVADA ---
-                time.sleep(5) # Aguarda a reação do TikTok ao clique
+                time.sleep(5)
                 print("[*] Tirando foto da tela após o clique para auditoria...")
                 navegador.save_screenshot("debug_tiktok_sucesso.png")
-                # -----------------------------------
                 break
                 
         print("[*] Aguardando 20 segundos para a plataforma exibir a tela de confirmação...")
@@ -121,10 +125,12 @@ def postar_no_tiktok(caminho_video, descricao):
 
     except Exception as e:
         print(f"[-] Erro durante a automação visual na nuvem. Detalhes: {e}")
-        try:
-            navegador.save_screenshot("debug_tiktok_erro.png")
-            print("[*] Foto do erro salva com sucesso.")
-        except:
-            pass
+        if navegador:
+            try:
+                navegador.save_screenshot("debug_tiktok_erro.png")
+                print("[*] Foto do erro salva com sucesso.")
+            except:
+                pass
     finally:
-        navegador.quit()
+        if navegador:
+            navegador.quit()
