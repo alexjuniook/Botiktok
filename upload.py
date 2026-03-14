@@ -62,9 +62,6 @@ def postar_no_tiktok(caminho_video, descricao):
         print("\n[*] Aguardando a página carregar (15 segundos)...")
         time.sleep(15)
 
-        # ---------------------------------------------------------
-        # NOVO: DESTRUIDOR DE POPUPS E TUTORIAIS
-        # ---------------------------------------------------------
         print("[*] Limpando popups e tutoriais da tela...")
         try:
             navegador.execute_script("""
@@ -73,7 +70,6 @@ def postar_no_tiktok(caminho_video, descricao):
             """)
         except:
             pass
-        # ---------------------------------------------------------
 
         print("[*] Buscando o campo de inserção de vídeo...")
         input_arquivo = WebDriverWait(navegador, 60).until(
@@ -89,7 +85,6 @@ def postar_no_tiktok(caminho_video, descricao):
             EC.presence_of_element_located((By.CSS_SELECTOR, ".public-DraftEditor-content"))
         )
         
-        # Clique forçado via JS para ignorar qualquer obstáculo invisível
         navegador.execute_script("arguments[0].click();", caixa_texto)
         time.sleep(1)
         navegador.execute_script("arguments[0].innerText = ''", caixa_texto)
@@ -111,9 +106,14 @@ def postar_no_tiktok(caminho_video, descricao):
                     time.sleep(10)
                     tentativas += 1
                 
-                # Clique forçado no botão de publicar para garantir
                 navegador.execute_script("arguments[0].click();", btn)
                 print("[+] Clique NATIVO de publicação efetuado com sucesso!")
+                
+                # --- CÂMERA DE SEGURANÇA ATIVADA ---
+                time.sleep(5) # Aguarda a reação do TikTok ao clique
+                print("[*] Tirando foto da tela após o clique para auditoria...")
+                navegador.save_screenshot("debug_tiktok_sucesso.png")
+                # -----------------------------------
                 break
                 
         print("[*] Aguardando 20 segundos para a plataforma exibir a tela de confirmação...")
@@ -121,5 +121,10 @@ def postar_no_tiktok(caminho_video, descricao):
 
     except Exception as e:
         print(f"[-] Erro durante a automação visual na nuvem. Detalhes: {e}")
+        try:
+            navegador.save_screenshot("debug_tiktok_erro.png")
+            print("[*] Foto do erro salva com sucesso.")
+        except:
+            pass
     finally:
         navegador.quit()
