@@ -62,6 +62,19 @@ def postar_no_tiktok(caminho_video, descricao):
         print("\n[*] Aguardando a página carregar (15 segundos)...")
         time.sleep(15)
 
+        # ---------------------------------------------------------
+        # NOVO: DESTRUIDOR DE POPUPS E TUTORIAIS
+        # ---------------------------------------------------------
+        print("[*] Limpando popups e tutoriais da tela...")
+        try:
+            navegador.execute_script("""
+                var overlays = document.querySelectorAll('[class*="react-joyride"], [class*="modal"], [class*="overlay"]');
+                overlays.forEach(e => e.remove());
+            """)
+        except:
+            pass
+        # ---------------------------------------------------------
+
         print("[*] Buscando o campo de inserção de vídeo...")
         input_arquivo = WebDriverWait(navegador, 60).until(
             EC.presence_of_element_located((By.XPATH, "//input[@type='file' and @accept='video/*']"))
@@ -73,9 +86,11 @@ def postar_no_tiktok(caminho_video, descricao):
 
         print("[*] Escrevendo a legenda do vídeo...")
         caixa_texto = WebDriverWait(navegador, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, ".public-DraftEditor-content"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".public-DraftEditor-content"))
         )
-        caixa_texto.click()
+        
+        # Clique forçado via JS para ignorar qualquer obstáculo invisível
+        navegador.execute_script("arguments[0].click();", caixa_texto)
         time.sleep(1)
         navegador.execute_script("arguments[0].innerText = ''", caixa_texto)
         caixa_texto.send_keys(descricao)
@@ -96,7 +111,8 @@ def postar_no_tiktok(caminho_video, descricao):
                     time.sleep(10)
                     tentativas += 1
                 
-                btn.click()
+                # Clique forçado no botão de publicar para garantir
+                navegador.execute_script("arguments[0].click();", btn)
                 print("[+] Clique NATIVO de publicação efetuado com sucesso!")
                 break
                 
