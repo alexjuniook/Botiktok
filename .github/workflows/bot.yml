@@ -33,4 +33,5 @@ jobs:
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        TIKTOK_COOKIES: ${{ secrets.TIKTOK_COOKIES }}
       run: python bot.py
