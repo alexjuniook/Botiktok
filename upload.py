@@ -25,7 +25,6 @@ def postar_no_tiktok(caminho_video, descricao):
     opcoes.add_argument("--disable-dev-shm-usage")
     opcoes.add_argument("--no-sandbox")
     
-    # A pasta de usuário local foi removida, pois usaremos cookies puros
     opcoes.add_argument("--disable-blink-features=AutomationControlled")
     opcoes.add_experimental_option("excludeSwitches", ["enable-automation"])
     opcoes.add_experimental_option('useAutomationExtension', False)
@@ -35,7 +34,6 @@ def postar_no_tiktok(caminho_video, descricao):
 
     try:
         print("[*] Preparando o navegador e acessando o domínio base...")
-        # É obrigatório acessar o site primeiro antes de injetar os cookies
         navegador.get("https://www.tiktok.com")
         time.sleep(5)
 
@@ -49,7 +47,6 @@ def postar_no_tiktok(caminho_video, descricao):
         cookies = json.loads(cookies_str)
         for cookie in cookies:
             try:
-                # O Selenium precisa apenas dos dados vitais do cookie
                 navegador.add_cookie({
                     'name': cookie['name'],
                     'value': cookie['value'],
