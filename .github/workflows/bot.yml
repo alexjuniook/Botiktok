@@ -1,0 +1,36 @@
+name: Bot TikTok Automático
+
+on:
+  schedule:
+    # Roda no minuto 0 de toda hora (Ex: 14:00, 15:00, 16:00...)
+    - cron: '0 * * * *'
+  workflow_dispatch: # Permite que você clique em "Run workflow" manualmente no GitHub
+
+jobs:
+  postar_video:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Baixar o código do repositório
+      uses: actions/checkout@v4
+
+    - name: Configurar o Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Instalar ImageMagick (Edição de Vídeo)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y imagemagick
+        # Corrige as políticas de segurança do ImageMagick no Linux para permitir textos no MoviePy
+        sudo sed -i 's/<policy domain="path" rights="none" pattern="@\*"//g' /etc/ImageMagick-6/policy.xml
+
+    - name: Instalar bibliotecas do Python
+      run: pip install -r requirements.txt
+
+    - name: Executar o Bot Principal
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      run: python bot.py
